@@ -1,0 +1,321 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Calendar as CalendarIcon, Users, CreditCard, AlertCircle, CheckCircle } from "lucide-react";
+import { format, addDays } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+export default function BookingForm({ packageData, onSubmit, loading }) {
+  const [formData, setFormData] = useState({
+    traveler_name: "",
+    traveler_email: "",
+    traveler_phone: "",
+    traveler_cpf: "",
+    number_of_travelers: 1,
+    start_date: null,
+    payment_method: "",
+    special_requests: ""
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.traveler_name.trim()) newErrors.traveler_name = "Nome é obrigatório";
+    if (!formData.traveler_email.trim()) newErrors.traveler_email = "E-mail é obrigatório";
+    if (!formData.traveler_phone.trim()) newErrors.traveler_phone = "Telefone é obrigatório";
+    if (!formData.traveler_cpf.trim()) newErrors.traveler_cpf = "CPF é obrigatório";
+    if (!formData.start_date) newErrors.start_date = "Data de início é obrigatória";
+    if (!formData.payment_method) newErrors.payment_method = "Selecione a forma de pagamento";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      onSubmit(formData);
+    }
+  };
+
+  const totalAmount = packageData.price * formData.number_of_travelers;
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Traveler Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-blue-600" />
+            Informações do Viajante
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="traveler_name">Nome Completo *</Label>
+              <Input
+                id="traveler_name"
+                value={formData.traveler_name}
+                onChange={(e) => setFormData({...formData, traveler_name: e.target.value})}
+                placeholder="Seu nome completo"
+                className={errors.traveler_name ? "border-red-500" : ""}
+              />
+              {errors.traveler_name && (
+                <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.traveler_name}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="traveler_email">E-mail *</Label>
+              <Input
+                id="traveler_email"
+                type="email"
+                value={formData.traveler_email}
+                onChange={(e) => setFormData({...formData, traveler_email: e.target.value})}
+                placeholder="seu@email.com"
+                className={errors.traveler_email ? "border-red-500" : ""}
+              />
+              {errors.traveler_email && (
+                <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.traveler_email}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="traveler_phone">Telefone/WhatsApp *</Label>
+              <Input
+                id="traveler_phone"
+                value={formData.traveler_phone}
+                onChange={(e) => setFormData({...formData, traveler_phone: e.target.value})}
+                placeholder="(11) 99999-9999"
+                className={errors.traveler_phone ? "border-red-500" : ""}
+              />
+              {errors.traveler_phone && (
+                <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.traveler_phone}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="traveler_cpf">CPF *</Label>
+              <Input
+                id="traveler_cpf"
+                value={formData.traveler_cpf}
+                onChange={(e) => setFormData({...formData, traveler_cpf: e.target.value})}
+                placeholder="000.000.000-00"
+                className={errors.traveler_cpf ? "border-red-500" : ""}
+              />
+              {errors.traveler_cpf && (
+                <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.traveler_cpf}
+                </p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Travel Details */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5 text-green-600" />
+            Detalhes da Viagem
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <Label>Data de Início *</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={`w-full justify-start text-left font-normal ${
+                      errors.start_date ? "border-red-500" : ""
+                    }`}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.start_date ? (
+                      format(formData.start_date, "PPP", { locale: ptBR })
+                    ) : (
+                      <span>Selecione a data</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={formData.start_date}
+                    onSelect={(date) => setFormData({...formData, start_date: date})}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              {errors.start_date && (
+                <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.start_date}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="number_of_travelers">Número de Viajantes *</Label>
+              <Select
+                value={formData.number_of_travelers.toString()}
+                onValueChange={(value) => setFormData({...formData, number_of_travelers: parseInt(value)})}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                    <SelectItem key={num} value={num.toString()}>
+                      {num} {num === 1 ? "pessoa" : "pessoas"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="special_requests">Solicitações Especiais</Label>
+            <Textarea
+              id="special_requests"
+              value={formData.special_requests}
+              onChange={(e) => setFormData({...formData, special_requests: e.target.value})}
+              placeholder="Ex: Necessidade de cadeira de rodas, restrições alimentares, preferência de andar no hotel..."
+              rows={3}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment Method */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5 text-purple-600" />
+            Forma de Pagamento
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Select
+            value={formData.payment_method}
+            onValueChange={(value) => setFormData({...formData, payment_method: value})}
+          >
+            <SelectTrigger className={errors.payment_method ? "border-red-500" : ""}>
+              <SelectValue placeholder="Selecione a forma de pagamento" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="credit_card">
+                💳 Cartão de Crédito (à vista ou parcelado)
+              </SelectItem>
+              <SelectItem value="pix">
+                📱 PIX (5% de desconto)
+              </SelectItem>
+              <SelectItem value="bank_transfer">
+                🏦 Transferência Bancária
+              </SelectItem>
+              <SelectItem value="installments">
+                📊 Parcelamento em até 12x
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.payment_method && (
+            <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />
+              {errors.payment_method}
+            </p>
+          )}
+          
+          {formData.payment_method === "pix" && (
+            <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <p className="text-sm text-green-800 dark:text-green-300 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
+                Ganhe 5% de desconto pagando via PIX! Total: R$ {(totalAmount * 0.95).toFixed(2)}
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Summary */}
+      <Card className="bg-gradient-to-br from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 border-2 border-blue-200 dark:border-blue-800">
+        <CardHeader>
+          <CardTitle>Resumo da Reserva</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-600 dark:text-slate-400">Pacote:</span>
+            <span className="font-semibold">{packageData.title}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-600 dark:text-slate-400">Viajantes:</span>
+            <span className="font-semibold">{formData.number_of_travelers} pessoa(s)</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-600 dark:text-slate-400">Valor por pessoa:</span>
+            <span className="font-semibold">R$ {packageData.price}</span>
+          </div>
+          {formData.payment_method === "pix" && (
+            <div className="flex justify-between items-center text-green-600 dark:text-green-400">
+              <span>Desconto PIX (5%):</span>
+              <span className="font-semibold">- R$ {(totalAmount * 0.05).toFixed(2)}</span>
+            </div>
+          )}
+          <div className="border-t-2 border-blue-300 dark:border-blue-700 pt-3 flex justify-between items-center">
+            <span className="text-lg font-bold">TOTAL:</span>
+            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              R$ {formData.payment_method === "pix" ? (totalAmount * 0.95).toFixed(2) : totalAmount.toFixed(2)}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Submit Button */}
+      <Button
+        type="submit"
+        size="lg"
+        disabled={loading}
+        className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-lg py-6"
+      >
+        {loading ? (
+          <>Processando...</>
+        ) : (
+          <>
+            <CheckCircle className="w-5 h-5 mr-2" />
+            Confirmar Reserva
+          </>
+        )}
+      </Button>
+
+      <p className="text-sm text-center text-slate-600 dark:text-slate-400">
+        Ao confirmar, você receberá um e-mail com os detalhes da reserva e instruções para pagamento.
+      </p>
+    </form>
+  );
+}
