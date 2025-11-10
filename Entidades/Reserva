@@ -1,0 +1,211 @@
+{
+  "name": "Booking",
+  "type": "object",
+  "properties": {
+    "package_id": {
+      "type": "string",
+      "description": "ID do pacote reservado"
+    },
+    "package_name": {
+      "type": "string",
+      "description": "Nome do pacote"
+    },
+    "package_price": {
+      "type": "number",
+      "description": "Pre\u00e7o unit\u00e1rio do pacote"
+    },
+    "traveler_name": {
+      "type": "string",
+      "description": "Nome completo do viajante principal"
+    },
+    "traveler_email": {
+      "type": "string",
+      "format": "email",
+      "description": "E-mail do viajante"
+    },
+    "traveler_phone": {
+      "type": "string",
+      "description": "Telefone/WhatsApp do viajante"
+    },
+    "traveler_cpf": {
+      "type": "string",
+      "description": "CPF do viajante principal"
+    },
+    "number_of_travelers": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "N\u00famero de viajantes"
+    },
+    "additional_travelers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "cpf": {
+            "type": "string"
+          },
+          "birth_date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "description": "Informa\u00e7\u00f5es dos viajantes adicionais"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de in\u00edcio da viagem"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de t\u00e9rmino da viagem"
+    },
+    "total_amount": {
+      "type": "number",
+      "description": "Valor total da reserva"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "credit_card",
+        "pix",
+        "bank_transfer",
+        "installments"
+      ],
+      "description": "M\u00e9todo de pagamento"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "cancelled",
+        "refunded"
+      ],
+      "default": "pending",
+      "description": "Status do pagamento"
+    },
+    "booking_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "cancelled",
+        "completed"
+      ],
+      "default": "pending",
+      "description": "Status da reserva"
+    },
+    "special_requests": {
+      "type": "string",
+      "description": "Solicita\u00e7\u00f5es especiais do cliente"
+    },
+    "confirmation_code": {
+      "type": "string",
+      "description": "C\u00f3digo de confirma\u00e7\u00e3o da reserva"
+    },
+    "payment_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "method": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "receipt_url": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Hist\u00f3rico de pagamentos"
+    },
+    "reschedule_request": {
+      "type": "object",
+      "properties": {
+        "requested_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "new_start_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "approved",
+            "rejected"
+          ]
+        },
+        "admin_notes": {
+          "type": "string"
+        }
+      },
+      "description": "Solicita\u00e7\u00e3o de remarca\u00e7\u00e3o"
+    },
+    "cancellation_request": {
+      "type": "object",
+      "properties": {
+        "requested_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "approved",
+            "rejected"
+          ]
+        },
+        "refund_amount": {
+          "type": "number"
+        },
+        "admin_notes": {
+          "type": "string"
+        }
+      },
+      "description": "Solicita\u00e7\u00e3o de cancelamento"
+    },
+    "original_start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data original antes de remarca\u00e7\u00e3o"
+    }
+  },
+  "required": [
+    "package_id",
+    "package_name",
+    "traveler_name",
+    "traveler_email",
+    "traveler_phone",
+    "number_of_travelers",
+    "start_date",
+    "total_amount"
+  ]
+}
