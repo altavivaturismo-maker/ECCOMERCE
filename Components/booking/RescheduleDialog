@@ -1,0 +1,186 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Calendar as CalendarIcon, AlertCircle, Info } from "lucide-react";
+import { format, addDays, differenceInDays } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+export default function RescheduleDialog({ booking, open, onClose, onSubmit, loading }) {
+  const [newStartDate, setNewStartDate] = useState(null);
+  const [reason, setReason] = useState("");
+
+  const currentDate = new Date();
+  const bookingDate = new Date(booking.start_date);
+  const daysUntilTrip = differenceInDays(bookingDate, currentDate);
+
+  // Regras de remarcação
+  const canReschedule = daysUntilTrip >= 7;
+  const rescheduleInfo = daysUntilTrip >= 30 
+    ? "Remarcação gratuita disponível (mais de 30 dias)"
+    : daysUntilTrip >= 15 
+    ? "Taxa de remarcação: R$ 50,00 (15-29 dias)"
+    : daysUntilTrip >= 7
+    ? "Taxa de remarcação: R$ 100,00 (7-14 dias)"
+    : "Remarcação não disponível (menos de 7 dias)";
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!newStartDate || !reason) return;
+
+    onSubmit({
+      new_start_date: format(newStartDate, 'yyyy-MM-dd'),
+      reason: reason.trim()
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl">Remarcar Reserva</DialogTitle>
+          <DialogDescription>
+            Solicite uma nova data para sua viagem
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Current Booking Info */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+            <h3 className="font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+              <Info className="w-5 h-5 text-blue-600" />
+              Informações Atuais
+            </h3>
+            <div className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
+              <p><strong>Pacote:</strong> {booking.package_name}</p>
+              <p><strong>Data atual:</strong> {format(new Date(booking.start_date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</p>
+              <p><strong>Código:</strong> {booking.confirmation_code}</p>
+            </div>
+          </div>
+
+          {/* Reschedule Rules */}
+          <div className={`p-4 rounded-lg border-2 ${
+            canReschedule 
+              ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800" 
+              : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+          }`}>
+            <h3 className="font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+              <AlertCircle className={`w-5 h-5 ${canReschedule ? "text-green-600" : "text-red-600"}`} />
+              Política de Remarcação
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+              {rescheduleInfo}
+            </p>
+            {!canReschedule && (
+              <p className="text-sm text-red-600 dark:text-red-400 font-semibold">
+                Remarcações devem ser solicitadas com pelo menos 7 dias de antecedência.
+              </p>
+            )}
+          </div>
+
+          {canReschedule && (
+            <>
+              {/* New Date Selection */}
+              <div>
+                <Label htmlFor="new_date">Nova Data de Início *</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {newStartDate ? (
+                        format(newStartDate, "PPP", { locale: ptBR })
+                      ) : (
+                        <span>Selecione a nova data</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={newStartDate}
+                      onSelect={setNewStartDate}
+                      disabled={(date) => date < addDays(new Date(), 7)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <p className="text-xs text-slate-500 mt-1">
+                  A nova data deve ser pelo menos 7 dias a partir de hoje
+                </p>
+              </div>
+
+              {/* Reason */}
+              <div>
+                <Label htmlFor="reason">Motivo da Remarcação *</Label>
+                <Textarea
+                  id="reason"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Explique o motivo da remarcação..."
+                  rows={4}
+                  required
+                />
+              </div>
+
+              {/* Important Notice */}
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+                <h3 className="font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                  <Info className="w-5 h-5 text-yellow-600" />
+                  Importante
+                </h3>
+                <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-disc list-inside">
+                  <li>Nossa equipe analisará sua solicitação em até 24 horas</li>
+                  <li>A disponibilidade da nova data será verificada</li>
+                  <li>Taxas aplicáveis serão informadas antes da confirmação</li>
+                  <li>Você receberá atualizações por e-mail e WhatsApp</li>
+                </ul>
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex gap-3 justify-end">
+                <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={loading || !newStartDate || !reason}
+                  className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
+                >
+                  {loading ? "Enviando..." : "Solicitar Remarcação"}
+                </Button>
+              </div>
+            </>
+          )}
+
+          {!canReschedule && (
+            <div className="flex gap-3 justify-end">
+              <Button type="button" variant="outline" onClick={onClose}>
+                Fechar
+              </Button>
+              <Button 
+                type="button"
+                onClick={() => window.open(`https://wa.me/5511994479615?text=Olá! Preciso remarcar minha reserva ${booking.confirmation_code}, mas está fora do prazo. Podemos conversar?`, '_blank')}
+                className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
+              >
+                Falar com Atendimento
+              </Button>
+            </div>
+          )}
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
