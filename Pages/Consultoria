@@ -1,0 +1,325 @@
+import React, { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { 
+  Lightbulb, CheckCircle, Heart, Sparkles, Calendar,
+  MapPin, Users, Star, ArrowRight, MessageCircle
+} from "lucide-react";
+import { motion } from "framer-motion";
+import ConsultoriaForm from "../components/ConsultoriaForm"; // Added import
+
+export default function Consultoria() {
+  const [showForm, setShowForm] = useState(false); // Added state
+
+  const beneficios = [
+    {
+      icon: Heart,
+      titulo: "Roteiro Personalizado",
+      descricao: "Criamos um itinerário único baseado nas suas preferências e estilo de viagem"
+    },
+    {
+      icon: Calendar,
+      titulo: "Flexibilidade Total",
+      descricao: "Adapte dates, destinos e atividades conforme suas necessidades"
+    },
+    {
+      icon: MapPin,
+      titulo: "Destinos Exclusivos",
+      descricao: "Acesso a lugares especiais e experiências fora do roteiro tradicional"
+    },
+    {
+      icon: Users,
+      titulo: "Suporte Completo",
+      descricao: "Acompanhamento antes, durante e depois da sua viagem"
+    },
+    {
+      icon: Star,
+      titulo: "Curadoria Especializada",
+      descricao: "Seleção de hotéis, restaurantes e experiências de alta qualidade"
+    },
+    {
+      icon: Sparkles,
+      titulo: "Experiências Autênticas",
+      descricao: "Conexão genuína com a cultura local e práticas sustentáveis"
+    }
+  ];
+
+  const etapas = [
+    {
+      numero: "01",
+      titulo: "Consultoria Inicial",
+      descricao: "Conversamos para entender seus sonhos, preferências e orçamento"
+    },
+    {
+      numero: "02",
+      titulo: "Planejamento",
+      descricao: "Criamos um roteiro detalhado com todas as experiências e logística"
+    },
+    {
+      numero: "03",
+      titulo: "Personalização",
+      descricao: "Ajustamos cada detalhe até alcançar a viagem perfeita para você"
+    },
+    {
+      numero: "04",
+      titulo: "Reservas",
+      descricao: "Cuidamos de todas as reservas e garantimos as melhores condições"
+    },
+    {
+      numero: "05",
+      titulo: "Acompanhamento",
+      descricao: "Suporte 24/7 durante toda a sua viagem"
+    }
+  ];
+
+  const exemplos = [
+    {
+      titulo: "Lua de Mel Romântica",
+      destino: "Fernando de Noronha",
+      duracao: "7 dias",
+      imagem: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80",
+      descricao: "Resort boutique, jantares privativos e mergulhos em praias desertas"
+    },
+    {
+      titulo: "Aventura em Família",
+      destino: "Chapada Diamantina",
+      duracao: "5 dias",
+      imagem: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
+      descricao: "Trilhas adaptadas, cachoeiras e hospedagem acolhedora"
+    },
+    {
+      titulo: "Imersão Cultural",
+      destino: "Região Nordeste",
+      duracao: "10 dias",
+      imagem: "https://images.unsplash.com/photo-1544989164-fb5a6d7b52c5?w=800&q=80",
+      descricao: "Arte, música, gastronomia e história do Brasil autêntico"
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      {/* Hero Section */}
+      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1920&q=80"
+            alt="Consultoria"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-gray-50 dark:to-gray-950" />
+        </div>
+        
+        <div className="relative z-10 text-center px-4 max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Lightbulb className="w-16 h-16 mx-auto mb-6 text-yellow-400" />
+            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+              Consultoria Personalizada
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-200 mb-8">
+              Transformamos seus sonhos em roteiros únicos e inesquecíveis
+            </p>
+            <Button 
+              size="lg" 
+              onClick={() => setShowForm(true)}
+              className="bg-gradient-to-r from-[#4A90B5] to-[#7BC950] hover:from-[#3A7FA5] hover:to-[#6AB840] text-white px-10 py-6 text-lg rounded-xl shadow-2xl hover:scale-105 transition-all"
+            >
+              <Sparkles className="mr-2 w-6 h-6" />
+              Iniciar Consultoria Personalizada
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Formulário de Consultoria */}
+      {showForm && (
+        <section className="py-20 px-4 bg-white dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                Planeje Sua Viagem Perfeita
+              </h2>
+              <p className="text-xl text-gray-600 dark:text-gray-400">
+                Responda algumas perguntas e receba uma proposta personalizada
+              </p>
+            </div>
+            <ConsultoriaForm />
+          </div>
+        </section>
+      )}
+
+      {/* Benefícios */}
+      <section className="py-20 px-4 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              Por que escolher nossa consultoria?
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Criamos experiências sob medida que vão além do convencional
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {beneficios.map((beneficio, index) => (
+              <motion.div
+                key={beneficio.titulo}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="p-6 hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 group h-full">
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#4A90B5] to-[#7BC950] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <beneficio.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                    {beneficio.titulo}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {beneficio.descricao}
+                  </p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Como Funciona */}
+      <section className="py-20 px-4 bg-gray-50 dark:bg-gray-950">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              Como Funciona
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400">
+              Um processo simples para criar sua viagem perfeita
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {etapas.map((etapa, index) => (
+              <motion.div
+                key={etapa.numero}
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="p-6 border-none hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-900">
+                  <div className="flex items-start gap-6">
+                    <div className="flex-shrink-0">
+                      <div className="w-16 h-16 bg-gradient-to-br from-[#4A90B5] to-[#7BC950] rounded-2xl flex items-center justify-center text-white text-2xl font-bold">
+                        {etapa.numero}
+                      </div>
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                        {etapa.titulo}
+                      </h3>
+                      <p className="text-lg text-gray-600 dark:text-gray-400">
+                        {etapa.descricao}
+                      </p>
+                    </div>
+                    <CheckCircle className="flex-shrink-0 w-8 h-8 text-green-500" />
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Exemplos */}
+      <section className="py-20 px-4 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              Exemplos de Roteiros Personalizados
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400">
+              Inspire-se com algumas de nossas criações
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {exemplos.map((exemplo, index) => (
+              <motion.div
+                key={exemplo.titulo}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.15 }}
+                viewport={{ once: true }}
+              >
+                <Card className="overflow-hidden group hover:shadow-2xl transition-all duration-500 border-none">
+                  <div className="relative h-64 overflow-hidden">
+                    <img
+                      src={exemplo.imagem}
+                      alt={exemplo.titulo}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <div className="flex items-center gap-2 text-white/80 text-sm mb-2">
+                        <MapPin className="w-4 h-4" />
+                        {exemplo.destino} • {exemplo.duracao}
+                      </div>
+                      <h3 className="text-2xl font-bold text-white">
+                        {exemplo.titulo}
+                      </h3>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {exemplo.descricao}
+                    </p>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Final */}
+      <section className="py-20 px-4 bg-gradient-to-br from-[#4A90B5] to-[#7BC950] text-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Pronto para criar sua viagem dos sonhos?
+          </h2>
+          <p className="text-xl mb-8 opacity-90">
+            {showForm 
+              ? "Role para cima e preencha o formulário personalizado" 
+              : "Comece respondendo nosso questionário personalizado ou fale conosco diretamente"}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {!showForm && (
+              <Button 
+                size="lg" 
+                onClick={() => {
+                  setShowForm(true);
+                  // Scroll to the form section (adjust the scroll position as needed)
+                  window.scrollTo({ top: 600, behavior: 'smooth' });
+                }}
+                className="bg-white text-[#4A90B5] hover:bg-gray-100 px-10 py-6 text-lg rounded-xl hover:scale-105 transition-all"
+              >
+                <Sparkles className="mr-2 w-6 h-6" />
+                Iniciar Questionário
+              </Button>
+            )}
+            <a href="https://wa.me/5511994479615?text=Olá! Gostaria de agendar uma consultoria personalizada" target="_blank" rel="noopener noreferrer">
+              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-[#4A90B5] px-10 py-6 text-lg rounded-xl hover:scale-105 transition-all">
+                <MessageCircle className="mr-2 w-6 h-6" />
+                Falar no WhatsApp
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
