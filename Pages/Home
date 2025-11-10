@@ -1,0 +1,305 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { 
+  ArrowRight, Package, MapPin, Users, Sparkles,
+  Shield, Heart, Leaf, Star, TrendingUp, CheckCircle, Phone
+} from "lucide-react";
+import { motion } from "framer-motion";
+
+export default function Home() {
+  return (
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/90 via-blue-800/85 to-green-900/90 z-10" />
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1920')",
+          }}
+        />
+        
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <Badge className="mb-6 px-4 py-2 bg-white/20 backdrop-blur-md text-white border-white/30">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Bem-vindo à Altaviva Turismo
+            </Badge>
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+              Sua Jornada dos Sonhos
+              <br />
+              <span className="bg-gradient-to-r from-blue-300 to-green-300 bg-clip-text text-transparent">
+                Começa Aqui
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Descubra destinos incríveis pelo Brasil com pacotes exclusivos, 
+              city tours personalizados e consultoria especializada
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to={createPageUrl("Pacotes")}>
+                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 text-lg px-8 py-6">
+                  <Package className="w-5 h-5 mr-2" />
+                  Ver Pacotes
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link to={createPageUrl("Consultoria")}>
+                <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 text-lg px-8 py-6">
+                  Consultoria Gratuita
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center p-2">
+            <div className="w-1 h-3 bg-white/70 rounded-full" />
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+              Por Que Escolher a Altaviva?
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              Experiência completa com atendimento personalizado e comprometimento com sua satisfação
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Package,
+                title: "Pacotes Completos",
+                description: "Hospedagem, transporte e passeios inclusos com preços transparentes e flexíveis",
+                color: "from-blue-500 to-blue-600"
+              },
+              {
+                icon: MapPin,
+                title: "City Tours Exclusivos",
+                description: "Roteiros culturais, gastronômicos e ecológicos nos melhores destinos brasileiros",
+                color: "from-green-500 to-green-600"
+              },
+              {
+                icon: Users,
+                title: "Atendimento Híbrido",
+                description: "Escritório em Franco da Rocha + canais digitais para sua comodidade",
+                color: "from-purple-500 to-purple-600"
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.2 }}
+                viewport={{ once: true }}
+              >
+                <Card className="h-full hover:shadow-xl transition-shadow duration-300 border-0 bg-gradient-to-br from-slate-50 to-white dark:from-slate-800 dark:to-slate-900">
+                  <CardContent className="p-8">
+                    <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}>
+                      <feature.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">
+                      {feature.title}
+                    </h3>
+                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Destinations Preview */}
+      <section className="py-20 bg-gradient-to-b from-slate-50 to-blue-50/30 dark:from-slate-950 dark:to-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+              Destinos em Destaque
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-400">
+              Conheça alguns dos nossos destinos mais procurados
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                image: "https://www.recantodossonhos.com.br/wp-content/uploads/2020/01/post-2-1080x675.png",
+                title: "Campos do Jordão",
+                subtitle: "A Suíça Brasileira",
+                price: "A partir de R$ 899"
+              },
+              {
+                image: "https://i0.wp.com/bonitour.com.br/wp-content/uploads/2023/09/imagem-generica-serra-gaucha-700x700-1.webp?fit=700%2C700&ssl=1",
+                title: "Serra Gaúcha",
+                subtitle: "Charme europeu no Brasil",
+                price: "A partir de R$ 1.299"
+              },
+              {
+                image: "https://media.istockphoto.com/id/488388458/pt/foto/turistas-no-igua%C3%A7u-cai-foz-do-igua%C3%A7u-brasil.jpg?s=612x612&w=0&k=20&c=BHWSKwTlTfaVNixQRtrQASjdIU4OSq5biaLeduij4Tc=",
+                title: "Foz do Iguaçu",
+                subtitle: "Maravilha natural",
+                price: "A partir de R$ 1.499"
+              }
+            ].map((destination, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.15 }}
+                viewport={{ once: true }}
+                className="group cursor-pointer"
+              >
+                <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2">
+                  <div className="relative h-64 overflow-hidden">
+                    <img 
+                      src={destination.image}
+                      alt={destination.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="text-2xl font-bold text-white mb-1">{destination.title}</h3>
+                      <p className="text-blue-200 text-sm">{destination.subtitle}</p>
+                    </div>
+                  </div>
+                  <CardContent className="p-6 bg-white dark:bg-slate-800">
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                        {destination.price}
+                      </span>
+                      <Link to={createPageUrl("Pacotes")}>
+                        <Button size="sm" className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700">
+                          Saiba Mais
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link to={createPageUrl("Pacotes")}>
+              <Button size="lg" variant="outline" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white dark:border-blue-400 dark:text-blue-400">
+                Ver Todos os Pacotes
+                <Package className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Values Section */}
+      <section className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+              Nossos Valores
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-400">
+              O que nos move todos os dias
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: Leaf, title: "Sustentabilidade", desc: "Ecoturismo responsável" },
+              { icon: Shield, title: "Transparência", desc: "Preços claros e justos" },
+              { icon: Heart, title: "Compromisso", desc: "Sua satisfação em primeiro lugar" },
+              { icon: Star, title: "Qualidade", desc: "Excelência em cada detalhe" }
+            ].map((value, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="text-center p-8 hover:shadow-lg transition-shadow border-0 bg-gradient-to-b from-white to-slate-50 dark:from-slate-800 dark:to-slate-900">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <value.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-white">{value.title}</h3>
+                  <p className="text-slate-600 dark:text-slate-400">{value.desc}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-green-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Pronto para Sua Próxima Aventura?
+            </h2>
+            <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+              Entre em contato conosco e descubra como podemos tornar sua viagem inesquecível
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to={createPageUrl("Contato")}>
+                <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 shadow-xl text-lg px-8 py-6">
+                  <Phone className="w-5 h-5 mr-2" />
+                  Falar com Especialista
+                </Button>
+              </Link>
+              <a href="https://wa.me/5511994479615" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" variant="outline" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-600 text-lg px-8 py-6">
+                  WhatsApp
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {[
+              { value: "500+", label: "Clientes Satisfeitos" },
+              { value: "50+", label: "Destinos" },
+              { value: "100%", label: "Satisfação" },
+              { value: "24/7", label: "Suporte" }
+            ].map((stat, index) => (
+              <div key={index}>
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
+                  {stat.value}
+                </div>
+                <div className="text-slate-600 dark:text-slate-400 font-medium">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
