@@ -1,0 +1,345 @@
+import React, { useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { base44 } from "@/api/base44Client";
+import { createPageUrl } from "@/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, MapPin, Calendar, Users, Star, CheckCircle, AlertCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import BookingForm from "../components/booking/BookingForm";
+import { addDays, format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+// Dados dos pacotes (mesmos da página Pacotes)
+const packages = [
+  {
+    id: "1",
+    title: "Campos do Jordão Completo",
+    subtitle: "4 dias na Suíça Brasileira",
+    image: "https://www.recantodossonhos.com.br/wp-content/uploads/2020/01/post-2-1080x675.png",
+    price: 899,
+    rating: 4.9,
+    duration: "4 dias / 3 noites",
+    description: "Pacote completo com hospedagem, café da manhã, city tour, visita a cervejarias artesanais e passeio de teleférico.",
+    includes: ["Hospedagem 4★", "Café da manhã", "City tour", "Teleférico", "Transfer"]
+  },
+  {
+    id: "2",
+    title: "Serra Gaúcha Encantadora",
+    subtitle: "5 dias de charme europeu",
+    image: "https://i0.wp.com/bonitour.com.br/wp-content/uploads/2023/09/imagem-generica-serra-gaucha-700x700-1.webp?fit=700%2C700&ssl=1",
+    price: 1299,
+    rating: 5.0,
+    duration: "5 dias / 4 noites",
+    description: "Explore Gramado e Canela com hospedagem premium, passeios aos principais pontos turísticos e degustação de vinhos.",
+    includes: ["Hotel boutique", "Café colonial", "Tour vinícolas", "Mini Mundo", "Transfer"]
+  },
+  {
+    id: "3",
+    title: "Foz do Iguaçu Inesquecível",
+    subtitle: "4 dias de natureza exuberante",
+    image: "https://media.istockphoto.com/id/488388458/pt/foto/turistas-no-igua%C3%A7u-cai-foz-do-igua%C3%A7u-brasil.jpg?s=612x612&w=0&k=20&c=BHWSKwTlTfaVNixQRtrQASjdIU4OSq5biaLeduij4Tc=",
+    price: 1499,
+    rating: 4.8,
+    duration: "4 dias / 3 noites",
+    description: "Conheça as Cataratas do Iguaçu, Parque das Aves, Usina de Itaipu e Marco das Três Fronteiras.",
+    includes: ["Hospedagem 4★", "Pensão completa", "Ingressos", "Guia", "Transfer"]
+  }
+];
+
+export default function BookPackage() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const packageId = searchParams.get("id");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [bookingCode, setBookingCode] = useState("");
+
+  const packageData = packages.find(p => p.id === packageId);
+
+  if (!packageData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="max-w-md w-full text-center p-8">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Pacote não encontrado</h2>
+          <p className="text-slate-600 dark:text-slate-400 mb-6">
+            O pacote que você está procurando não existe ou foi removido.
+          </p>
+          <Button onClick={() => navigate(createPageUrl("Pacotes"))}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar para Pacotes
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
+  const generateConfirmationCode = () => {
+    return 'ALTA' + Math.random().toString(36).substr(2, 9).toUpperCase();
+  };
+
+  const handleBookingSubmit = async (formData) => {
+    setLoading(true);
+    
+    try {
+      const user = await base44.auth.me().catch(() => null);
+      const confirmationCode = generateConfirmationCode();
+      
+      const totalAmount = formData.payment_method === "pix" 
+        ? packageData.price * formData.number_of_travelers * 0.95 
+        : packageData.price * formData.number_of_travelers;
+
+      const endDate = addDays(formData.start_date, parseInt(packageData.duration.split(' ')[0]));
+
+      const bookingData = {
+        package_id: packageData.id,
+        package_name: packageData.title,
+        package_price: packageData.price,
+        traveler_name: formData.traveler_name,
+        traveler_email: formData.traveler_email,
+        traveler_phone: formData.traveler_phone,
+        traveler_cpf: formData.traveler_cpf,
+        number_of_travelers: formData.number_of_travelers,
+        start_date: format(formData.start_date, 'yyyy-MM-dd'),
+        end_date: format(endDate, 'yyyy-MM-dd'),
+        total_amount: totalAmount,
+        payment_method: formData.payment_method,
+        payment_status: "pending",
+        booking_status: "pending",
+        special_requests: formData.special_requests || "",
+        confirmation_code: confirmationCode
+      };
+
+      // Criar reserva no banco
+      await base44.entities.Booking.create(bookingData);
+
+      // Enviar e-mail de confirmação
+      const emailBody = `
+Olá ${formData.traveler_name}!
+
+Sua reserva foi recebida com sucesso! 🎉
+
+CÓDIGO DE CONFIRMAÇÃO: ${confirmationCode}
+
+DETALHES DA RESERVA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 Pacote: ${packageData.title}
+📅 Data de início: ${format(formData.start_date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+📅 Data de término: ${format(endDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+👥 Número de viajantes: ${formData.number_of_travelers}
+💰 Valor total: R$ ${totalAmount.toFixed(2)}
+💳 Forma de pagamento: ${
+  formData.payment_method === "pix" ? "PIX (com 5% de desconto)" :
+  formData.payment_method === "credit_card" ? "Cartão de Crédito" :
+  formData.payment_method === "bank_transfer" ? "Transferência Bancária" :
+  "Parcelamento em até 12x"
+}
+
+PRÓXIMOS PASSOS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Nossa equipe entrará em contato em até 24 horas para confirmar sua reserva
+2. Você receberá as instruções de pagamento por WhatsApp: ${formData.traveler_phone}
+3. Após o pagamento, enviaremos o voucher e todos os detalhes da viagem
+
+${formData.special_requests ? `\nSOLICITAÇÕES ESPECIAIS:\n${formData.special_requests}\n` : ''}
+
+DÚVIDAS?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📞 WhatsApp: (11) 99447-9615
+📧 E-mail: altavivaturismo@gmail.com
+
+Estamos ansiosos para tornar sua viagem inesquecível! ✈️
+
+Atenciosamente,
+Equipe Altaviva Turismo
+      `.trim();
+
+      await base44.integrations.Core.SendEmail({
+        to: formData.traveler_email,
+        subject: `🎉 Reserva Confirmada - ${confirmationCode} - Altaviva Turismo`,
+        body: emailBody
+      });
+
+      setBookingCode(confirmationCode);
+      setSuccess(true);
+      
+    } catch (error) {
+      console.error("Erro ao criar reserva:", error);
+      alert("Erro ao processar sua reserva. Por favor, tente novamente ou entre em contato conosco.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-2xl w-full"
+        >
+          <Card className="border-0 shadow-2xl">
+            <CardContent className="p-12 text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <CheckCircle className="w-10 h-10 text-white" />
+              </div>
+              
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+                Reserva Confirmada!
+              </h1>
+              
+              <p className="text-lg text-slate-600 dark:text-slate-400 mb-6">
+                Sua reserva foi recebida com sucesso. Em breve entraremos em contato.
+              </p>
+
+              <div className="bg-gradient-to-br from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 rounded-xl p-6 mb-8">
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                  Código de Confirmação
+                </p>
+                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 tracking-wider">
+                  {bookingCode}
+                </p>
+              </div>
+
+              <div className="space-y-3 text-left bg-white dark:bg-slate-800 rounded-lg p-6 mb-8">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Um e-mail de confirmação foi enviado para você com todos os detalhes
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Nossa equipe entrará em contato em até 24 horas via WhatsApp
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Você pode acompanhar sua reserva na área "Minhas Reservas"
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  onClick={() => navigate(createPageUrl("MyBookings"))}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
+                >
+                  Ver Minhas Reservas
+                </Button>
+                <Button
+                  onClick={() => navigate(createPageUrl("Home"))}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Voltar ao Início
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          onClick={() => navigate(createPageUrl("Pacotes"))}
+          className="mb-6"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Voltar para Pacotes
+        </Button>
+
+        {/* Header */}
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+            Finalizar Reserva
+          </h1>
+          <p className="text-lg text-slate-600 dark:text-slate-400">
+            Preencha os dados abaixo para confirmar sua viagem
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Package Info */}
+          <div className="lg:col-span-1">
+            <Card className="sticky top-24 border-0 shadow-xl overflow-hidden">
+              <div className="relative h-48">
+                <img
+                  src={packageData.image}
+                  alt={packageData.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="text-xl font-bold text-white mb-1">
+                    {packageData.title}
+                  </h3>
+                  <p className="text-blue-200 text-sm">{packageData.subtitle}</p>
+                </div>
+              </div>
+
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30">
+                    <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
+                    {packageData.rating}
+                  </Badge>
+                  <span className="text-sm text-slate-600 dark:text-slate-400">
+                    {packageData.duration}
+                  </span>
+                </div>
+
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  {packageData.description}
+                </p>
+
+                <div>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white mb-2">
+                    O que está incluído:
+                  </p>
+                  <ul className="space-y-1">
+                    {packageData.includes.map((item, i) => (
+                      <li key={i} className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">Valor por pessoa:</span>
+                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      R$ {packageData.price}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Booking Form */}
+          <div className="lg:col-span-2">
+            <BookingForm
+              packageData={packageData}
+              onSubmit={handleBookingSubmit}
+              loading={loading}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
