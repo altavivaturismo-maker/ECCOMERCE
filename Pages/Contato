@@ -1,0 +1,349 @@
+
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  Phone, Mail, MapPin, Clock, MessageCircle,
+  Send, Facebook, Instagram, Sparkles, CheckCircle
+} from "lucide-react";
+import { motion } from "framer-motion";
+
+export default function Contato() {
+  const [formData, setFormData] = useState({
+    nome: "",
+    email: "",
+    telefone: "",
+    assunto: "",
+    mensagem: ""
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const message = `Olá! Vim através do site da Altaviva Turismo.
+
+Nome: ${formData.nome}
+Email: ${formData.email}
+Telefone: ${formData.telefone}
+Assunto: ${formData.assunto}
+Mensagem: ${formData.mensagem}`;
+    
+    const whatsappUrl = `https://wa.me/5511994479615?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  return (
+    <div className="min-h-screen pb-20">
+      {/* Hero Section */}
+      <section className="relative py-24 bg-gradient-to-br from-blue-900 via-green-900 to-blue-900 text-white overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Badge className="mb-4 px-4 py-2 bg-white/20 backdrop-blur-md text-white border-white/30">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Estamos Aqui Para Você
+            </Badge>
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+              Entre em Contato
+            </h1>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+              Atendimento híbrido: presencial em Franco da Rocha ou através 
+              dos nossos canais digitais. Escolha como prefere falar conosco!
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Contact Methods */}
+      <section className="py-16 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Canais de Atendimento
+            </h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400">
+              Escolha a melhor forma de falar com nossa equipe
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                icon: Phone,
+                title: "Telefone",
+                info: "(11) 99447-9615",
+                description: "Seg - Sex: 9h às 18h",
+                color: "from-blue-500 to-blue-600",
+                link: "tel:+5511994479615"
+              },
+              {
+                icon: MessageCircle,
+                title: "WhatsApp",
+                info: "(11) 99447-9615",
+                description: "Resposta rápida",
+                color: "from-green-500 to-green-600",
+                link: "https://wa.me/5511994479615"
+              },
+              {
+                icon: Mail,
+                title: "E-mail",
+                info: "altavivaturismo@gmail.com",
+                description: "24h para resposta",
+                color: "from-purple-500 to-purple-600",
+                link: "mailto:altavivaturismo@gmail.com"
+              },
+              {
+                icon: MapPin,
+                title: "Presencial",
+                info: "Franco da Rocha - SP",
+                description: "Centro da cidade",
+                color: "from-orange-500 to-orange-600",
+                link: "#localizacao"
+              }
+            ].map((method, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <a 
+                  href={method.link}
+                  target={method.link.startsWith('http') ? '_blank' : '_self'}
+                  rel="noopener noreferrer"
+                  className="block h-full"
+                >
+                  <Card className="h-full text-center p-8 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group">
+                    <CardContent className="p-0">
+                      <div className={`w-16 h-16 bg-gradient-to-br ${method.color} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
+                        <method.icon className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                        {method.title}
+                      </h3>
+                      <p className="text-slate-900 dark:text-white font-semibold mb-1">
+                        {method.info}
+                      </p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        {method.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </a>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Form */}
+      <section className="py-16 bg-gradient-to-b from-slate-50 to-blue-50/30 dark:from-slate-950 dark:to-slate-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Envie Sua Mensagem
+            </h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400">
+              Preencha o formulário e entraremos em contato em até 24 horas
+            </p>
+          </div>
+
+          <Card className="border-0 shadow-2xl">
+            <CardContent className="p-8 md:p-12">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="nome">Nome Completo *</Label>
+                    <Input
+                      id="nome"
+                      required
+                      value={formData.nome}
+                      onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                      placeholder="Digite seu nome completo"
+                      className="mt-2"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="telefone">Telefone/WhatsApp *</Label>
+                    <Input
+                      id="telefone"
+                      required
+                      value={formData.telefone}
+                      onChange={(e) => setFormData({...formData, telefone: e.target.value})}
+                      placeholder="(11) 99447-9615"
+                      className="mt-2"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="email">E-mail *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    placeholder="seu@email.com"
+                    className="mt-2"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="assunto">Assunto *</Label>
+                  <Select
+                    value={formData.assunto}
+                    onValueChange={(value) => setFormData({...formData, assunto: value})}
+                  >
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Selecione o assunto" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pacotes">Informações sobre Pacotes</SelectItem>
+                      <SelectItem value="citytour">City Tours</SelectItem>
+                      <SelectItem value="consultoria">Consultoria de Viagem</SelectItem>
+                      <SelectItem value="orcamento">Solicitar Orçamento</SelectItem>
+                      <SelectItem value="duvida">Dúvidas Gerais</SelectItem>
+                      <SelectItem value="sugestao">Sugestões</SelectItem>
+                      <SelectItem value="outro">Outro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="mensagem">Mensagem *</Label>
+                  <Textarea
+                    id="mensagem"
+                    required
+                    rows={6}
+                    value={formData.mensagem}
+                    onChange={(e) => setFormData({...formData, mensagem: e.target.value})}
+                    placeholder="Conte-nos como podemos ajudá-lo..."
+                    className="mt-2"
+                  />
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button 
+                    type="submit"
+                    size="lg"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-lg py-6"
+                  >
+                    <Send className="w-5 h-5 mr-2" />
+                    Enviar via WhatsApp
+                  </Button>
+                  <Button 
+                    type="button"
+                    size="lg"
+                    variant="outline"
+                    className="border-2 text-lg py-6"
+                    onClick={() => window.location.href = 'mailto:altavivaturismo@gmail.com'}
+                  >
+                    <Mail className="w-5 h-5 mr-2" />
+                    Enviar por E-mail
+                  </Button>
+                </div>
+
+                <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
+                  * Campos obrigatórios. Seus dados estão protegidos e serão usados apenas para contato.
+                </p>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Location */}
+      <section id="localizacao" className="py-16 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Nossa Localização
+            </h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400">
+              Venha nos visitar pessoalmente
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <Card className="p-8 border-0 shadow-xl">
+                <CardContent className="p-0 space-y-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-green-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                      <MapPin className="w-7 h-7 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                        Endereço
+                      </h3>
+                      <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                        <strong>Altaviva Turismo Ltda</strong><br />
+                        Centro, Franco da Rocha - SP<br />
+                        CEP: 07800-000
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                      <Clock className="w-7 h-7 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                        Horário de Atendimento
+                      </h3>
+                      <div className="text-slate-600 dark:text-slate-400 space-y-1">
+                        <p><strong>Segunda a Sexta:</strong> 9h às 18h</p>
+                        <p><strong>Sábado:</strong> 9h às 13h</p>
+                        <p><strong>Domingo e Feriados:</strong> Fechado</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                      Como Chegar
+                    </h3>
+                    <ul className="space-y-2 text-slate-600 dark:text-slate-400">
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span>Fácil acesso pela Rodovia Anhanguera</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span>Próximo à estação de trem</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span>Estacionamento gratuito no local</span>
+                      </li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
