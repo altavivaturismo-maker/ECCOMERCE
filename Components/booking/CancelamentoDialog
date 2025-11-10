@@ -1,0 +1,189 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { AlertCircle, Info, DollarSign } from "lucide-react";
+import { format, differenceInDays } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+export default function CancellationDialog({ booking, open, onClose, onSubmit, loading }) {
+  const [reason, setReason] = useState("");
+  const [confirmCancel, setConfirmCancel] = useState(false);
+
+  const currentDate = new Date();
+  const bookingDate = new Date(booking.start_date);
+  const daysUntilTrip = differenceInDays(bookingDate, currentDate);
+
+  // Cálculo de reembolso baseado na política
+  const calculateRefund = () => {
+    if (daysUntilTrip >= 30) {
+      return { percentage: 100, amount: booking.total_amount };
+    } else if (daysUntilTrip >= 15) {
+      return { percentage: 70, amount: booking.total_amount * 0.7 };
+    } else if (daysUntilTrip >= 7) {
+      return { percentage: 50, amount: booking.total_amount * 0.5 };
+    } else {
+      return { percentage: 0, amount: 0 };
+    }
+  };
+
+  const refundInfo = calculateRefund();
+  const canCancel = daysUntilTrip >= 1;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!reason || !confirmCancel) return;
+
+    onSubmit({
+      reason: reason.trim(),
+      expected_refund: refundInfo.amount
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl text-red-600 dark:text-red-400">
+            Cancelar Reserva
+          </DialogTitle>
+          <DialogDescription>
+            Solicite o cancelamento da sua viagem
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Current Booking Info */}
+          <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+            <h3 className="font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+              <Info className="w-5 h-5 text-blue-600" />
+              Detalhes da Reserva
+            </h3>
+            <div className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
+              <p><strong>Pacote:</strong> {booking.package_name}</p>
+              <p><strong>Data da viagem:</strong> {format(new Date(booking.start_date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</p>
+              <p><strong>Código:</strong> {booking.confirmation_code}</p>
+              <p><strong>Valor pago:</strong> R$ {booking.total_amount.toFixed(2)}</p>
+            </div>
+          </div>
+
+          {/* Refund Policy */}
+          <div className={`p-4 rounded-lg border-2 ${
+            refundInfo.percentage > 0
+              ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+              : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+          }`}>
+            <h3 className="font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+              <DollarSign className={`w-5 h-5 ${refundInfo.percentage > 0 ? "text-blue-600" : "text-red-600"}`} />
+              Política de Reembolso
+            </h3>
+            
+            <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+              <p><strong>Dias até a viagem:</strong> {daysUntilTrip} dias</p>
+              <p><strong>Percentual de reembolso:</strong> {refundInfo.percentage}%</p>
+              <p className="text-lg font-bold text-slate-900 dark:text-white">
+                Valor estimado do reembolso: R$ {refundInfo.amount.toFixed(2)}
+              </p>
+            </div>
+
+            <div className="mt-3 p-3 bg-white dark:bg-slate-700 rounded text-xs space-y-1">
+              <p>• <strong>30+ dias:</strong> Reembolso integral (100%)</p>
+              <p>• <strong>15-29 dias:</strong> Reembolso de 70%</p>
+              <p>• <strong>7-14 dias:</strong> Reembolso de 50%</p>
+              <p>• <strong>Menos de 7 dias:</strong> Sem reembolso</p>
+            </div>
+          </div>
+
+          {canCancel ? (
+            <>
+              {/* Cancellation Reason */}
+              <div>
+                <Label htmlFor="reason">Motivo do Cancelamento *</Label>
+                <Textarea
+                  id="reason"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Por favor, nos conte o motivo do cancelamento..."
+                  rows={4}
+                  required
+                />
+              </div>
+
+              {/* Important Information */}
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+                <h3 className="font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-yellow-600" />
+                  Informações Importantes
+                </h3>
+                <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-disc list-inside">
+                  <li>Sua solicitação será analisada em até 24 horas</li>
+                  <li>O reembolso será processado em até 10 dias úteis</li>
+                  <li>O valor será creditado na mesma forma de pagamento</li>
+                  <li>Esta ação não pode ser desfeita após confirmação</li>
+                </ul>
+              </div>
+
+              {/* Confirmation Checkbox */}
+              <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                <Checkbox
+                  id="confirm"
+                  checked={confirmCancel}
+                  onCheckedChange={setConfirmCancel}
+                />
+                <Label 
+                  htmlFor="confirm" 
+                  className="text-sm leading-relaxed cursor-pointer"
+                >
+                  Confirmo que li e entendi a política de cancelamento e desejo 
+                  prosseguir com a solicitação de cancelamento desta reserva.
+                </Label>
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex gap-3 justify-end">
+                <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+                  Voltar
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={loading || !reason || !confirmCancel}
+                  variant="destructive"
+                >
+                  {loading ? "Enviando..." : "Confirmar Cancelamento"}
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div>
+              <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg mb-4">
+                <p className="text-sm text-red-600 dark:text-red-400 font-semibold">
+                  Cancelamentos não são mais permitidos para reservas com menos de 1 dia para a viagem.
+                </p>
+              </div>
+              <div className="flex gap-3 justify-end">
+                <Button type="button" variant="outline" onClick={onClose}>
+                  Fechar
+                </Button>
+                <Button 
+                  type="button"
+                  onClick={() => window.open(`https://wa.me/5511994479615?text=Olá! Preciso de ajuda com minha reserva ${booking.confirmation_code}`, '_blank')}
+                  className="bg-gradient-to-r from-blue-600 to-green-600"
+                >
+                  Falar com Atendimento
+                </Button>
+              </div>
+            </div>
+          )}
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
