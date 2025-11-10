@@ -1,0 +1,343 @@
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  MapPin, Calendar, Users, Star, ArrowRight, Check,
+  Sparkles, Hotel, Car, Coffee, Camera, Heart, Lightbulb
+} from "lucide-react";
+import { motion } from "framer-motion";
+
+const packages = [
+  {
+    id: 1,
+    category: "completo",
+    image: "https://www.recantodossonhos.com.br/wp-content/uploads/2020/01/post-2-1080x675.png",
+    title: "Campos do Jordão Completo",
+    subtitle: "4 dias na Suíça Brasileira",
+    description: "Pacote completo com hospedagem, café da manhã, city tour, visita a cervejarias artesanais e passeio de teleférico.",
+    price: "899",
+    rating: 4.9,
+    duration: "4 dias / 3 noites",
+    people: "2-4 pessoas",
+    includes: ["Hospedagem 4★", "Café da manhã", "City tour", "Teleférico", "Transfer"],
+    highlights: ["Vila Capivari", "Amantikir", "Cervejarias", "Chocolates"]
+  },
+  {
+    id: 2,
+    category: "completo",
+    image: "https://i0.wp.com/bonitour.com.br/wp-content/uploads/2023/09/imagem-generica-serra-gaucha-700x700-1.webp?fit=700%2C700&ssl=1",
+    title: "Serra Gaúcha Encantadora",
+    subtitle: "5 dias de charme europeu",
+    description: "Explore Gramado e Canela com hospedagem premium, passeios aos principais pontos turísticos e degustação de vinhos.",
+    price: "1299",
+    rating: 5.0,
+    duration: "5 dias / 4 noites",
+    people: "2-6 pessoas",
+    includes: ["Hotel boutique", "Café colonial", "Tour vinícolas", "Mini Mundo", "Transfer"],
+    highlights: ["Gramado", "Canela", "Vinícolas", "Lago Negro"]
+  },
+  {
+    id: 3,
+    category: "completo",
+    image: "https://media.istockphoto.com/id/488388458/pt/foto/turistas-no-igua%C3%A7u-cai-foz-do-igua%C3%A7u-brasil.jpg?s=612x612&w=0&k=20&c=BHWSKwTlTfaVNixQRtrQASjdIU4OSq5biaLeduij4Tc=",
+    title: "Foz do Iguaçu Inesquecível",
+    subtitle: "4 dias de natureza exuberante",
+    description: "Conheça as Cataratas do Iguaçu, Parque das Aves, Usina de Itaipu e Marco das Três Fronteiras.",
+    price: "1499",
+    rating: 4.8,
+    duration: "4 dias / 3 noites",
+    people: "2-5 pessoas",
+    includes: ["Hospedagem 4★", "Pensão completa", "Ingressos", "Guia", "Transfer"],
+    highlights: ["Cataratas", "Parque das Aves", "Itaipu", "Três Fronteiras"]
+  },
+  {
+    id: 4,
+    category: "citytour",
+    image: "https://i0.statig.com.br/bancodeimagens/7p/2c/ma/7p2cmadaxy7bi17rf1rxwllk6.jpg",
+    title: "City Tour São Paulo Cultural",
+    subtitle: "1 dia explorando a metrópole",
+    description: "Tour completo pelos principais pontos culturais de SP: MASP, Avenida Paulista, Beco do Batman e Mercado Municipal.",
+    price: "199",
+    rating: 4.7,
+    duration: "1 dia (8 horas)",
+    people: "Até 10 pessoas",
+    includes: ["Guia especializado", "Transporte", "Ingressos museus", "Lanche"],
+    highlights: ["MASP", "Paulista", "Vila Madalena", "Mercadão"]
+  },
+  {
+    id: 5,
+    category: "citytour",
+    image: "https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?w=800",
+    title: "City Tour Rio de Janeiro",
+    subtitle: "1 dia na Cidade Maravilhosa",
+    description: "Conheça o Cristo Redentor, Pão de Açúcar, Escadaria Selarón e as praias mais famosas do Rio.",
+    price: "249",
+    rating: 5.0,
+    duration: "1 dia (8 horas)",
+    people: "Até 8 pessoas",
+    includes: ["Guia bilíngue", "Van executiva", "Ingressos", "Seguro"],
+    highlights: ["Cristo", "Pão de Açúcar", "Selarón", "Copacabana"]
+  },
+  {
+    id: 6,
+    category: "hospedagem",
+    image: "https://images.unsplash.com/photo-1602002418082-a4443e081dd1?w=800",
+    title: "Resort Praia do Forte - Bahia",
+    subtitle: "7 dias de paraíso tropical",
+    description: "Hospedagem all-inclusive em resort 5 estrelas com praia privativa, spa, gastronomia premiada e atividades aquáticas.",
+    price: "2499",
+    rating: 4.9,
+    duration: "7 dias / 6 noites",
+    people: "2 pessoas",
+    includes: ["All-inclusive", "Spa incluso", "Esportes aquáticos", "Kids club", "Transfer"],
+    highlights: ["Resort 5★", "Praia privativa", "Spa", "Gastronomia"]
+  },
+  {
+    id: 7,
+    category: "consultoria",
+    image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800",
+    title: "Roteiro Personalizado Nacional",
+    subtitle: "Planejamento sob medida",
+    description: "Consultoria completa para criar seu roteiro ideal pelo Brasil, com sugestões personalizadas de destinos, hotéis e experiências.",
+    price: "299",
+    rating: 5.0,
+    duration: "Consultoria online",
+    people: "Qualquer grupo",
+    includes: ["Reunião online", "Roteiro detalhado", "Lista de hotéis", "Orçamento", "Suporte"],
+    highlights: ["100% personalizado", "Economia", "Dicas exclusivas", "Suporte 30 dias"]
+  },
+  {
+    id: 8,
+    category: "consultoria",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800",
+    title: "Consultoria Lua de Mel",
+    subtitle: "Seu momento especial perfeito",
+    description: "Planejamento completo para lua de mel dos sonhos, com sugestões românticas, hotéis premium e experiências exclusivas.",
+    price: "499",
+    rating: 5.0,
+    duration: "Consultoria VIP",
+    people: "Casais",
+    includes: ["Consultoria presencial", "Roteiro romântico", "Parcerias exclusivas", "Mimos especiais", "Suporte total"],
+    highlights: ["Experiência VIP", "Hotéis românticos", "Surpresas", "Desconto especial"]
+  }
+];
+
+export default function Pacotes() {
+  const [activeCategory, setActiveCategory] = useState("todos");
+
+  const filteredPackages = activeCategory === "todos" 
+    ? packages 
+    : packages.filter(pkg => pkg.category === activeCategory);
+
+  return (
+    <div className="min-h-screen pb-20">
+      {/* Hero Section */}
+      <section className="relative py-24 bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 text-white overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Badge className="mb-4 px-4 py-2 bg-white/20 backdrop-blur-md text-white border-white/30">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Pacotes Exclusivos 2024/2025
+            </Badge>
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+              Pacotes e Serviços
+            </h1>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+              Escolha entre nossos pacotes completos, city tours, reservas de hospedagem 
+              ou consultoria personalizada para sua próxima viagem
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Filter Tabs */}
+      <section className="py-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-20 z-40 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Tabs value={activeCategory} onValueChange={setActiveCategory}>
+            <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-5 bg-slate-100 dark:bg-slate-800 p-1">
+              <TabsTrigger value="todos" className="text-sm">Todos</TabsTrigger>
+              <TabsTrigger value="completo" className="text-sm">Completos</TabsTrigger>
+              <TabsTrigger value="citytour" className="text-sm">City Tours</TabsTrigger>
+              <TabsTrigger value="hospedagem" className="text-sm">Hospedagem</TabsTrigger>
+              <TabsTrigger value="consultoria" className="text-sm">Consultoria</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      </section>
+
+      {/* Packages Grid */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredPackages.map((pkg, index) => (
+              <motion.div
+                key={pkg.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="h-full flex flex-col overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group">
+                  {/* Image */}
+                  <div className="relative h-64 overflow-hidden">
+                    <img 
+                      src={pkg.image}
+                      alt={pkg.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    
+                    {/* Category Badge */}
+                    <Badge className="absolute top-4 left-4 bg-blue-600 text-white border-0">
+                      {pkg.category === "completo" && "Pacote Completo"}
+                      {pkg.category === "citytour" && "City Tour"}
+                      {pkg.category === "hospedagem" && "Hospedagem"}
+                      {pkg.category === "consultoria" && "Consultoria"}
+                    </Badge>
+
+                    {/* Rating */}
+                    <div className="absolute top-4 right-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <span className="text-sm font-semibold text-slate-900">{pkg.rating}</span>
+                    </div>
+
+                    {/* Title Overlay */}
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="text-2xl font-bold text-white mb-1">{pkg.title}</h3>
+                      <p className="text-blue-200 text-sm">{pkg.subtitle}</p>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <CardContent className="flex-1 p-6 bg-white dark:bg-slate-800">
+                    <p className="text-slate-600 dark:text-slate-400 mb-4 line-clamp-3">
+                      {pkg.description}
+                    </p>
+
+                    {/* Info */}
+                    <div className="flex flex-wrap gap-3 mb-4">
+                      <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                        <Calendar className="w-4 h-4 text-blue-600" />
+                        {pkg.duration}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                        <Users className="w-4 h-4 text-green-600" />
+                        {pkg.people}
+                      </div>
+                    </div>
+
+                    {/* Includes */}
+                    <div className="mb-4">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Inclui:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {pkg.includes.slice(0, 3).map((item, i) => (
+                          <Badge key={i} variant="secondary" className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                            <Check className="w-3 h-3 mr-1" />
+                            {item}
+                          </Badge>
+                        ))}
+                        {pkg.includes.length > 3 && (
+                          <Badge variant="secondary" className="text-xs">
+                            +{pkg.includes.length - 3} mais
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Highlights */}
+                    <div className="flex flex-wrap gap-2">
+                      {pkg.highlights.map((highlight, i) => (
+                        <span key={i} className="text-xs text-slate-500 dark:text-slate-400">
+                          • {highlight}
+                        </span>
+                      ))}
+                    </div>
+                  </CardContent>
+
+                  {/* Footer */}
+                  <CardFooter className="p-6 pt-0 bg-white dark:bg-slate-800">
+                    <div className="w-full flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">A partir de</p>
+                        <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                          R$ {pkg.price}
+                        </p>
+                      </div>
+                      <Link to={`${createPageUrl("BookPackage")}?id=${pkg.id}`}>
+                        <Button className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 shadow-lg">
+                          Reservar Agora
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardFooter>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Info Section */}
+      <section className="py-16 bg-gradient-to-br from-blue-600 to-green-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <div>
+              <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4">
+                <Hotel className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Flexibilidade</h3>
+              <p className="text-blue-100">Pacotes personalizáveis de acordo com seu perfil e orçamento</p>
+            </div>
+            <div>
+              <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Promoções Sazonais</h3>
+              <p className="text-blue-100">Ofertas especiais em datas comemorativas e baixa temporada</p>
+            </div>
+            <div>
+              <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Atendimento Premium</h3>
+              <p className="text-blue-100">Suporte completo antes, durante e depois da sua viagem</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+            Não encontrou o pacote ideal?
+          </h2>
+          <p className="text-xl text-slate-600 dark:text-slate-400 mb-8">
+            Nossa equipe pode criar um roteiro personalizado especialmente para você
+          </p>
+          <Link to={createPageUrl("Consultoria")}>
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-lg px-8 py-6">
+              <Lightbulb className="w-5 h-5 mr-2" />
+              Solicitar Consultoria Gratuita
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
+}
